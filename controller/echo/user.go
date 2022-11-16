@@ -21,15 +21,16 @@ func NewUserController(db *gorm.DB, server *echo.Echo) *UserController {
 }
 
 func (c *UserController) RegisterHandler() {
-    c.server.GET("/users/:id", c.Get)
-    c.server.GET("/users", c.List)
-    c.server.POST("/users", c.Create)
-    c.server.PUT("/users/:id", c.Update)
-    c.server.DELETE("/users/:id", c.Delete)
+    group := c.server.Group("/users")
+
+    group.GET("/:id", c.Get)
+    group.GET("", c.List)
+    group.POST("", c.Create)
+    group.PUT("/:id", c.Update)
+    group.DELETE("/:id", c.Delete)
 }
 
 func (c *UserController) Get(e echo.Context) error {
-    // TODO: handle validation
     userId := util.StringToInt(e.Param("id"))
 
     result, err := user.NewService(c.db).Get(context.Background(), uint(userId))
@@ -41,7 +42,12 @@ func (c *UserController) Get(e echo.Context) error {
 }
 
 func (c *UserController) List(e echo.Context) error {
-    result, err := user.NewService(c.db).List(context.Background(), &message.ListUserRequest{Page: 1, PerPage: 100})
+    request := &message.ListUserRequest{
+        Page:    uint(util.StringToInt(e.QueryParam("page"))),
+        PerPage: uint(util.StringToInt(e.QueryParam("per_page"))),
+    }
+
+    result, err := user.NewService(c.db).List(context.Background(), request)
     if err != nil {
         return echo.NewHTTPError(http.StatusBadRequest, err.Error())
     }
@@ -50,13 +56,40 @@ func (c *UserController) List(e echo.Context) error {
 }
 
 func (c *UserController) Create(e echo.Context) error {
-    return nil
+    request := new(message.User)
+    if err := e.Bind(request); err != nil {
+        return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+    }
+
+    result, err := user.NewService(c.db).Create(context.Background(), request)
+    if err != nil {
+        return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+    }
+
+    return e.JSONPretty(http.StatusCreated, result, "  ")
 }
 
 func (c *UserController) Update(e echo.Context) error {
-    return nil
+    request := new(message.User)
+    if err := e.Bind(request); err != nil {
+        return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+    }
+
+    result, err := user.NewService(c.db).Update(context.Background(), request)
+    if err != nil {
+        return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+    }
+
+    return e.JSONPretty(http.StatusOK, result, "  ")
 }
 
 func (c *UserController) Delete(e echo.Context) error {
-    return nil
+    userId := util.StringToInt(e.Param("id"))
+
+    err := user.NewService(c.db).Delete(context.Background(), uint(userId))
+    if err != nil {
+        return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+    }
+
+    return e.NoContent(http.StatusNoContent)
 }

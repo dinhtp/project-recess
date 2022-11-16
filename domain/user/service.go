@@ -26,7 +26,7 @@ func (s *Service) Get(ctx context.Context, ID uint) (*message.User, error) {
 }
 
 func (s *Service) List(ctx context.Context, r *message.ListUserRequest) (*message.ListUserResponse, error) {
-    results, total, err := s.repo.List()
+    results, total, err := s.repo.List(r)
     if err != nil {
         return nil, err
     }
@@ -46,14 +46,34 @@ func (s *Service) List(ctx context.Context, r *message.ListUserRequest) (*messag
     }, nil
 }
 
-func (s *Service) Create(ctx context.Context) {
+func (s *Service) Create(ctx context.Context, r *message.User) (*message.User, error) {
+    result, err := s.repo.Insert(prepareDataToCreate(r))
+    if err != nil {
+        return nil, err
+    }
 
+    return prepareDataToResponse(result), nil
 }
 
-func (s *Service) Update(ctx context.Context) {
+func (s *Service) Update(ctx context.Context, r *message.User) (*message.User, error) {
+    _, err := s.repo.Read(r.ID)
+    if err != nil {
+        return nil, err
+    }
 
+    result, err := s.repo.Update(prepareDataToUpdate(r))
+    if err != nil {
+        return nil, err
+    }
+
+    return s.Get(ctx, result.ID)
 }
 
-func (s *Service) Delete(ctx context.Context) {
+func (s *Service) Delete(ctx context.Context, ID uint) error {
+    result, err := s.repo.Read(ID)
+    if err != nil {
+        return err
+    }
 
+    return s.repo.Delete(result)
 }

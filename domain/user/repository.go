@@ -2,6 +2,7 @@ package user
 
 import (
     "github.com/dinhtp/project-recess/database/models"
+    "github.com/dinhtp/project-recess/domain/message"
     "gorm.io/gorm"
 )
 
@@ -23,17 +24,19 @@ func (r *Repository) Read(ID uint) (*models.User, error) {
     return result, nil
 }
 
-func (r *Repository) List() ([]*models.User, int64, error) {
+func (r *Repository) List(req *message.ListUserRequest) ([]*models.User, int64, error) {
     var totalCount int64
     var results []*models.User
 
+    limit := int(req.PerPage)
+    offset := limit * (int(req.Page) - 1)
     query := r.db.Model(&models.User{}).Order("updated_at DESC")
 
     if err := query.Select("id").Count(&totalCount).Error; err != nil {
         return nil, 0, err
     }
 
-    if err := query.Select("*").Limit(100).Offset(0).Find(&results).Error; err != nil {
+    if err := query.Select("*").Limit(limit).Offset(offset).Find(&results).Error; err != nil {
         return nil, 0, err
     }
 
