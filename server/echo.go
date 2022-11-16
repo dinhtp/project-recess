@@ -13,6 +13,7 @@ type EchoServer struct {
 
 func (s *EchoServer) Serve() {
     server := echo.New()
+
     echoCtrl.NewUserController(s.db, server).RegisterHandler()
     server.Logger.Fatal(server.Start(":8080"))
 }

@@ -1,8 +1,8 @@
 package user
 
 import (
-    "github.com/dinhtp/project-recess/database/models"
     "github.com/dinhtp/project-recess/domain/message"
+    "github.com/dinhtp/project-recess/domain/models"
     "gorm.io/gorm"
 )
 
@@ -14,10 +14,20 @@ func NewRepository(db *gorm.DB) *Repository {
     return &Repository{db: db}
 }
 
-func (r *Repository) Read(ID uint) (*models.User, error) {
+func (r *Repository) Read(ID uint, email string) (*models.User, error) {
     var result *models.User
 
-    if err := r.db.Where("id = ?", ID).First(&result).Error; nil != err {
+    query := r.db.Model(&models.User{})
+
+    if ID > 0 {
+        query = query.Where("id = ?", ID)
+    }
+
+    if email != "" {
+        query = query.Where("email = ?", email)
+    }
+
+    if err := query.First(&result).Error; nil != err {
         return nil, err
     }
 

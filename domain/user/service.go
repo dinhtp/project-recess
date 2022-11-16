@@ -5,6 +5,7 @@ import (
     "math"
 
     "github.com/dinhtp/project-recess/domain/message"
+    "golang.org/x/crypto/bcrypt"
     "gorm.io/gorm"
 )
 
@@ -17,7 +18,7 @@ func NewService(db *gorm.DB) *Service {
 }
 
 func (s *Service) Get(ctx context.Context, ID uint) (*message.User, error) {
-    result, err := s.repo.Read(ID)
+    result, err := s.repo.Read(ID, "")
     if err != nil {
         return nil, err
     }
@@ -56,7 +57,7 @@ func (s *Service) Create(ctx context.Context, r *message.User) (*message.User, e
 }
 
 func (s *Service) Update(ctx context.Context, r *message.User) (*message.User, error) {
-    _, err := s.repo.Read(r.ID)
+    _, err := s.repo.Read(r.ID, "")
     if err != nil {
         return nil, err
     }
@@ -70,10 +71,24 @@ func (s *Service) Update(ctx context.Context, r *message.User) (*message.User, e
 }
 
 func (s *Service) Delete(ctx context.Context, ID uint) error {
-    result, err := s.repo.Read(ID)
+    result, err := s.repo.Read(ID, "")
     if err != nil {
         return err
     }
 
     return s.repo.Delete(result)
+}
+
+func (s *Service) Login(ctx context.Context, r *message.LoginUserRequest) (*message.User, error) {
+    result, err := s.repo.Read(0, r.Email)
+    if err != nil {
+        return nil, err
+    }
+
+    err = bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(r.Password))
+    if err != nil {
+        return nil, err
+    }
+
+    return prepareDataToResponse(result), nil
 }

@@ -36,3 +36,14 @@ type ListUserResponse struct {
     Page       uint    `json:"page"`
     PerPage    uint    `json:"per_page"`
 }
+
+type LoginUserRequest struct {
+    Email    string `json:"email"`
+    Password string `json:"password"`
+}
+
+type LoginUserResponse struct {
+    ID    uint   `json:"id"`
+    Email string `json:"email"`
+    Token string `json:"token"`
+}

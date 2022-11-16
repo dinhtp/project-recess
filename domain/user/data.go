@@ -3,8 +3,9 @@ package user
 import (
     "time"
 
-    "github.com/dinhtp/project-recess/database/models"
     "github.com/dinhtp/project-recess/domain/message"
+    "github.com/dinhtp/project-recess/domain/models"
+    "golang.org/x/crypto/bcrypt"
 )
 
 func prepareDataToResponse(o *models.User) *message.User {
@@ -44,7 +45,6 @@ func prepareDataToResponse(o *models.User) *message.User {
 func prepareDataToCreate(o *message.User) *models.User {
     data := &models.User{
         Email:          o.Email,
-        Password:       o.Password,
         CasbinUser:     o.CasbinUser,
         AuthSource:     o.AuthSource,
         FullName:       o.FullName,
@@ -59,6 +59,11 @@ func prepareDataToCreate(o *message.User) *models.User {
         FirstLogin:     o.FirstLogin,
         AccountType:    o.AccountType,
         BillingStatus:  o.BillingStatus,
+    }
+
+    hashedBytes, err := bcrypt.GenerateFromPassword([]byte(o.Password), 10)
+    if err == nil {
+        data.Password = string(hashedBytes)
     }
 
     if dateTime, err := time.Parse(time.RFC3339, o.FreedomDate); !dateTime.IsZero() && err == nil {
