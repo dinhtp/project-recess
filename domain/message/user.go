@@ -23,3 +23,16 @@ type User struct {
     CreatedAt      string `json:"created_at"`
     UpdatedAt      string `json:"updated_at"`
 }
+
+type ListUserRequest struct {
+    Page    uint `json:"page"`
+    PerPage uint `json:"per_page"`
+}
+
+type ListUserResponse struct {
+    Items      []*User `json:"items"`
+    TotalCount uint    `json:"total_count"`
+    MaxPage    uint    `json:"max_page"`
+    Page       uint    `json:"page"`
+    PerPage    uint    `json:"per_page"`
+}

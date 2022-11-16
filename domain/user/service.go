@@ -2,6 +2,7 @@ package user
 
 import (
     "context"
+    "math"
 
     "github.com/dinhtp/project-recess/domain/message"
     "gorm.io/gorm"
@@ -24,8 +25,25 @@ func (s *Service) Get(ctx context.Context, ID uint) (*message.User, error) {
     return prepareDataToResponse(result), nil
 }
 
-func (s *Service) List(ctx context.Context) {
+func (s *Service) List(ctx context.Context, r *message.ListUserRequest) (*message.ListUserResponse, error) {
+    results, total, err := s.repo.List()
+    if err != nil {
+        return nil, err
+    }
 
+    var list []*message.User
+
+    for _, result := range results {
+        list = append(list, prepareDataToResponse(result))
+    }
+
+    return &message.ListUserResponse{
+        Items:      list,
+        TotalCount: uint(total),
+        MaxPage:    uint(math.Ceil(float64(total) / float64(r.PerPage))),
+        Page:       r.Page,
+        PerPage:    r.PerPage,
+    }, nil
 }
 
 func (s *Service) Create(ctx context.Context) {

@@ -33,7 +33,7 @@ func (r *Repository) List() ([]*models.User, int64, error) {
         return nil, 0, err
     }
 
-    if err := query.Select("*").Find(&results).Error; err != nil {
+    if err := query.Select("*").Limit(100).Offset(0).Find(&results).Error; err != nil {
         return nil, 0, err
     }
 
