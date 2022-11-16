@@ -11,15 +11,15 @@ import (
 
 var serveCmd = &cobra.Command{
     Use:   "serve",
-    Short: "A brief description of your command",
+    Short: "project recess serve command",
     Run:   RunServeCommand,
 }
 
 func init() {
     rootCmd.AddCommand(serveCmd)
 
-    serveCmd.Flags().StringP("address", "", "service-address", "service address")
-    serveCmd.Flags().StringP("sqliteDsn", "", "sqlite-dsn", "sqlite connection string")
+    serveCmd.Flags().StringP("address", "", ":8080", "service address")
+    serveCmd.Flags().StringP("sqliteDsn", "", "sqlite.db", "sqlite connection string")
 
     _ = viper.BindPFlag("address", serveCmd.Flags().Lookup("address"))
     _ = viper.BindPFlag("sqliteDsn", serveCmd.Flags().Lookup("sqliteDsn"))

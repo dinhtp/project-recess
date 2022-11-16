@@ -12,7 +12,7 @@ var cfgFile string
 
 var rootCmd = &cobra.Command{
     Use:   "project-recess",
-    Short: "A brief description of your application",
+    Short: "project recess root command",
 }
 
 func Execute() {
