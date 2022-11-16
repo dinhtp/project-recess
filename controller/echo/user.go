@@ -3,13 +3,13 @@ package echo
 import (
     "context"
     "net/http"
-    "time"
 
     "github.com/dinhtp/project-recess/domain/message"
     "github.com/dinhtp/project-recess/domain/user"
     "github.com/dinhtp/project-recess/util"
     "github.com/golang-jwt/jwt"
     "github.com/labstack/echo/v4"
+    "github.com/labstack/echo/v4/middleware"
     "gorm.io/gorm"
 )
 
@@ -25,12 +25,14 @@ func NewUserController(db *gorm.DB, server *echo.Echo) *UserController {
 func (c *UserController) RegisterHandler() {
     group := c.server.Group("/users")
 
+    jwtConfig := middleware.JWTConfig{Claims: &jwt.StandardClaims{}, SigningKey: []byte("secret")}
+    group.Use(middleware.JWTWithConfig(jwtConfig))
+
     group.GET("/:id", c.Get)
     group.GET("", c.List)
     group.POST("", c.Create)
     group.PUT("/:id", c.Update)
     group.DELETE("/:id", c.Delete)
-    group.POST("/login", c.Login)
 }
 
 func (c *UserController) Get(e echo.Context) error {
@@ -95,31 +97,4 @@ func (c *UserController) Delete(e echo.Context) error {
     }
 
     return e.NoContent(http.StatusNoContent)
-}
-
-func (c *UserController) Login(e echo.Context) error {
-    request := new(message.LoginUserRequest)
-    if err := e.Bind(request); err != nil {
-        return echo.NewHTTPError(http.StatusUnauthorized, "invalid email or password")
-    }
-
-    result, err := user.NewService(c.db).Login(context.Background(), request)
-    if err != nil {
-        return echo.NewHTTPError(http.StatusUnauthorized, "invalid email or password")
-    }
-
-    claims := jwt.StandardClaims{ExpiresAt: time.Now().Add(time.Hour * 72).Unix()}
-    token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-    t, err := token.SignedString([]byte("secret"))
-    if err != nil {
-        return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-    }
-
-    response := &message.LoginUserResponse{
-        ID:    result.ID,
-        Email: result.Email,
-        Token: t,
-    }
-
-    return e.JSONPretty(http.StatusOK, response, "  ")
 }
