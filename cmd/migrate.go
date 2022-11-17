@@ -3,9 +3,9 @@ package cmd
 import (
     "errors"
     "fmt"
+    "github.com/dinhtp/project-recess/database"
     "os"
 
-    "github.com/dinhtp/project-recess/database/connection"
     "github.com/dinhtp/project-recess/migration"
     "github.com/spf13/cobra"
     "github.com/spf13/viper"
@@ -23,7 +23,7 @@ func init() {
 
 func runMigrateCommand(cmd *cobra.Command, args []string) {
     // init DB Connection
-    connector := connection.NewConnector(connection.DbTypeSqLite, viper.GetString("sqliteDsn"))
+    connector := database.NewConnector(database.DbTypeSqLite, viper.GetString("sqliteDsn"))
     if connector == nil {
         panic(errors.New("unsupported database"))
     }

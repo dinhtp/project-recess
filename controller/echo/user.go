@@ -4,6 +4,7 @@ import (
     "context"
     "net/http"
 
+    "github.com/casbin/casbin/v2"
     "github.com/dinhtp/project-recess/domain/message"
     "github.com/dinhtp/project-recess/domain/user"
     "github.com/dinhtp/project-recess/util"
@@ -11,6 +12,10 @@ import (
     "github.com/labstack/echo/v4"
     "github.com/labstack/echo/v4/middleware"
     "gorm.io/gorm"
+)
+
+const (
+    PathPrefix = "/users"
 )
 
 type UserController struct {
@@ -23,16 +28,27 @@ func NewUserController(db *gorm.DB, server *echo.Echo) *UserController {
 }
 
 func (c *UserController) RegisterHandler() {
-    group := c.server.Group("/users")
+    group := c.server.Group(PathPrefix)
 
-    jwtConfig := middleware.JWTConfig{Claims: &jwt.StandardClaims{}, SigningKey: []byte("secret")}
-    group.Use(middleware.JWTWithConfig(jwtConfig))
+    c.registerMiddleware(group)
 
     group.GET("/:id", c.Get)
     group.GET("", c.List)
     group.POST("", c.Create)
     group.PUT("/:id", c.Update)
     group.DELETE("/:id", c.Delete)
+}
+
+func (c *UserController) registerMiddleware(group *echo.Group) {
+    jwtConfig := middleware.JWTConfig{Claims: &jwt.StandardClaims{}, SigningKey: []byte(TokenKey)}
+    group.Use(middleware.JWTWithConfig(jwtConfig))
+
+    enforcer, err := casbin.NewEnforcer("model.conf", "policy.csv")
+    if err != nil {
+        return
+    }
+
+    group.Use(newEnforcer(enforcer).Enforce)
 }
 
 func (c *UserController) Get(e echo.Context) error {

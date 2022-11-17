@@ -3,7 +3,7 @@ package cmd
 import (
     "errors"
 
-    "github.com/dinhtp/project-recess/database/connection"
+    "github.com/dinhtp/project-recess/database"
     "github.com/dinhtp/project-recess/server"
     "github.com/spf13/cobra"
     "github.com/spf13/viper"
@@ -27,7 +27,7 @@ func init() {
 
 func RunServeCommand(cmd *cobra.Command, args []string) {
     // init DB Connection
-    connector := connection.NewConnector(connection.DbTypeSqLite, viper.GetString("sqliteDsn"))
+    connector := database.NewConnector(database.DbTypeSqLite, viper.GetString("sqliteDsn"))
     if connector == nil {
         panic(errors.New("unsupported database"))
     }
