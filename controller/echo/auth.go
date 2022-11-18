@@ -41,12 +41,14 @@ func (c *AuthController) Login(e echo.Context) error {
         return echo.NewHTTPError(http.StatusUnauthorized, "invalid email or password")
     }
 
+    // create jwt standard claims
     claims := jwt.StandardClaims{
         ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
         Id:        fmt.Sprintf("%d", result.ID),
         Subject:   result.CasbinUser,
     }
 
+    // create jwt token and sign the token
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
     signedToken, err := token.SignedString([]byte(TokenKey))
     if err != nil {

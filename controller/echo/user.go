@@ -14,10 +14,6 @@ import (
     "gorm.io/gorm"
 )
 
-const (
-    PathPrefix = "/users"
-)
-
 type UserController struct {
     server *echo.Echo
     db     *gorm.DB
@@ -28,7 +24,7 @@ func NewUserController(db *gorm.DB, server *echo.Echo) *UserController {
 }
 
 func (c *UserController) RegisterHandler() {
-    group := c.server.Group(PathPrefix)
+    group := c.server.Group(user.PathPrefix)
 
     c.registerMiddleware(group)
 

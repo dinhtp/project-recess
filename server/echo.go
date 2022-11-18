@@ -17,5 +17,5 @@ func (s *EchoServer) Serve() {
     echoCtrl.NewAuthController(s.db, server).RegisterHandler()
     echoCtrl.NewUserController(s.db, server).RegisterHandler()
 
-    server.Logger.Fatal(server.Start(":8080"))
+    server.Logger.Fatal(server.Start(s.Address))
 }
