@@ -1,4 +1,0 @@
-p, admin, /users, PUT
-p, admin, /users/*, GET
-p, admin, /users, POST
-p, admin, /users, DELETE
