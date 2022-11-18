@@ -3,3 +3,5 @@
 /.idea
 /tmplogin
 sqlite.db
+model.conf
+policy.csv

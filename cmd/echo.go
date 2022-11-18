@@ -18,11 +18,11 @@ var echoCmd = &cobra.Command{
 func init() {
     serveCmd.AddCommand(echoCmd)
 
-    serveCmd.Flags().StringP("address", "", ":8080", "service address")
-    serveCmd.Flags().StringP("sqliteDsn", "", "sqlite.db", "sqlite connection string")
+    echoCmd.Flags().StringP("address", "", ":8080", "service address")
+    echoCmd.Flags().StringP("sqliteDsn", "", "sqlite.db", "sqlite connection string")
 
-    _ = viper.BindPFlag("address", serveCmd.Flags().Lookup("address"))
-    _ = viper.BindPFlag("sqliteDsn", serveCmd.Flags().Lookup("sqliteDsn"))
+    _ = viper.BindPFlag("address", echoCmd.Flags().Lookup("address"))
+    _ = viper.BindPFlag("sqliteDsn", echoCmd.Flags().Lookup("sqliteDsn"))
 }
 
 func RunEchoCommand(cmd *cobra.Command, args []string) {

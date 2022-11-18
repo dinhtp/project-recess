@@ -17,27 +17,27 @@ var muxCmd = &cobra.Command{
 func init() {
     serveCmd.AddCommand(muxCmd)
 
-    serveCmd.Flags().StringP("address", "", ":8080", "service address")
-    serveCmd.Flags().StringP("mysqlDsn", "", "", "mysql DSN connection string")
+    muxCmd.Flags().StringP("address", "", "0.0.0.0:8050", "service address")
+    muxCmd.Flags().StringP("mysqlDsn", "", "root:root@tcp(10.0.255.174:3306)/recess?charset=utf8mb4", "mysql DSN connection string")
 
-    _ = viper.BindPFlag("address", serveCmd.Flags().Lookup("address"))
-    _ = viper.BindPFlag("mysqlDsn", serveCmd.Flags().Lookup("mysqlDsn"))
+    _ = viper.BindPFlag("address", muxCmd.Flags().Lookup("address"))
+    _ = viper.BindPFlag("mysqlDsn", muxCmd.Flags().Lookup("mysqlDsn"))
 }
 
 func RunMuxCommand(cmd *cobra.Command, args []string) {
     // init DB Connection
-    connector := database.NewConnector(database.DbTypeMySql, viper.GetString("mysqlDsn"))
-    if connector == nil {
-        panic(errors.New("unsupported database"))
-    }
-
-    orm, err := connector.Connect()
-    if err != nil {
-        panic(err)
-    }
+    //connector := database.NewConnector(database.DbTypeMySql, viper.GetString("mysqlDsn"))
+    //if connector == nil {
+    //    panic(errors.New("unsupported database"))
+    //}
+    //
+    //orm, err := connector.Connect()
+    //if err != nil {
+    //    panic(err)
+    //}
 
     // init HTTP server
-    muxServer := server.NewServer(orm, viper.GetString("address"), database.DbTypeMySql)
+    muxServer := server.NewServer(nil, viper.GetString("address"), database.DbTypeMySql)
     if muxServer == nil {
         panic(errors.New("unsupported http server"))
     }
