@@ -19,6 +19,7 @@ func (s *MuxServer) Serve() {
     router := mux.NewRouter()
 
     muxCtrl.NewUserController(s.db, router).RegisterHandler()
+    muxCtrl.NewAuthController(s.db, router).RegisterHandler()
 
     server := &http.Server{
         Handler:      router,

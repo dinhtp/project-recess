@@ -4,6 +4,7 @@ import (
     "errors"
     "github.com/dinhtp/project-recess/database"
     "github.com/dinhtp/project-recess/server"
+    "github.com/sirupsen/logrus"
     "github.com/spf13/cobra"
     "github.com/spf13/viper"
 )
@@ -25,22 +26,29 @@ func init() {
 }
 
 func RunMuxCommand(cmd *cobra.Command, args []string) {
+    serverAddress := viper.GetString("address")
+
     // init DB Connection
-    //connector := database.NewConnector(database.DbTypeMySql, viper.GetString("mysqlDsn"))
-    //if connector == nil {
-    //    panic(errors.New("unsupported database"))
-    //}
-    //
-    //orm, err := connector.Connect()
-    //if err != nil {
-    //    panic(err)
-    //}
+    connector := database.NewConnector(database.DbTypeMySql, viper.GetString("mysqlDsn"))
+    if connector == nil {
+        panic(errors.New("unsupported database"))
+    }
+
+    orm, err := connector.Connect()
+    if err != nil {
+        panic(err)
+    }
 
     // init HTTP server
-    muxServer := server.NewServer(nil, viper.GetString("address"), database.DbTypeMySql)
+    muxServer := server.NewServer(orm, serverAddress, database.DbTypeMySql)
     if muxServer == nil {
         panic(errors.New("unsupported http server"))
     }
+
+    logrus.WithFields(logrus.Fields{
+        "address": serverAddress,
+        "type":    "mux",
+    }).Info("mux http server started successfully")
 
     muxServer.Serve()
 }

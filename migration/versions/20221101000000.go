@@ -8,7 +8,7 @@ import (
 
 func Version20221101000000(tx *gorm.DB) error {
     type User struct {
-        ID        uint `gorm:"TYPE:INTEGER;NOTNULL;PRIMARY_KEY;AUTOINCREMENT"`
+        ID        uint `gorm:"TYPE:BIGINT(20) UNSIGNED AUTO_INCREMENT;NOT NULL;PRIMARY_KEY"`
         CreatedAt time.Time
         UpdatedAt time.Time
         DeletedAt gorm.DeletedAt `gorm:"index"`

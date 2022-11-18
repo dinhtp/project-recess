@@ -5,6 +5,7 @@ import (
 
     "github.com/dinhtp/project-recess/database"
     "github.com/dinhtp/project-recess/server"
+    "github.com/sirupsen/logrus"
     "github.com/spf13/cobra"
     "github.com/spf13/viper"
 )
@@ -26,6 +27,8 @@ func init() {
 }
 
 func RunEchoCommand(cmd *cobra.Command, args []string) {
+    serverAddress := viper.GetString("address")
+
     // init DB Connection
     connector := database.NewConnector(database.DbTypeSqLite, viper.GetString("sqliteDsn"))
     if connector == nil {
@@ -38,10 +41,15 @@ func RunEchoCommand(cmd *cobra.Command, args []string) {
     }
 
     // init HTTP server
-    echoServer := server.NewServer(orm, viper.GetString("address"), database.DbTypeSqLite)
+    echoServer := server.NewServer(orm, serverAddress, database.DbTypeSqLite)
     if echoServer == nil {
         panic(errors.New("unsupported http server"))
     }
+
+    logrus.WithFields(logrus.Fields{
+        "address": serverAddress,
+        "type":    "echo",
+    }).Info("echo http server started successfully")
 
     echoServer.Serve()
 }

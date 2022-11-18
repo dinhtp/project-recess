@@ -4,7 +4,6 @@ import (
     "context"
     "net/http"
 
-    "github.com/casbin/casbin/v2"
     "github.com/dinhtp/project-recess/domain/message"
     "github.com/dinhtp/project-recess/domain/user"
     "github.com/dinhtp/project-recess/util"
@@ -36,15 +35,15 @@ func (c *UserController) RegisterHandler() {
 }
 
 func (c *UserController) registerMiddleware(group *echo.Group) {
-    jwtConfig := middleware.JWTConfig{Claims: &jwt.StandardClaims{}, SigningKey: []byte(TokenKey)}
+    jwtConfig := middleware.JWTConfig{Claims: &jwt.StandardClaims{}, SigningKey: []byte(user.TokenKey)}
     group.Use(middleware.JWTWithConfig(jwtConfig))
 
-    enforcer, err := casbin.NewEnforcer("model.conf", "policy.csv")
-    if err != nil {
-        return
-    }
-
-    group.Use(newEnforcer(enforcer).Enforce)
+    //enforcer, err := casbin.NewEnforcer("/var/rbac/model.conf", "/var/rbac/policy.csv")
+    //if err != nil {
+    //    return
+    //}
+    //
+    //group.Use(newEnforcer(enforcer).Enforce)
 }
 
 func (c *UserController) Get(e echo.Context) error {

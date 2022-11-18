@@ -2,7 +2,10 @@ package user
 
 import (
     "context"
+    "fmt"
+    "github.com/golang-jwt/jwt"
     "math"
+    "time"
 
     "github.com/dinhtp/project-recess/domain/message"
     "golang.org/x/crypto/bcrypt"
@@ -79,7 +82,7 @@ func (s *Service) Delete(ctx context.Context, ID uint) error {
     return s.repo.Delete(result)
 }
 
-func (s *Service) Login(ctx context.Context, r *message.LoginUserRequest) (*message.User, error) {
+func (s *Service) Login(ctx context.Context, r *message.LoginUserRequest) (*message.LoginUserResponse, error) {
     result, err := s.repo.Read(0, r.Email)
     if err != nil {
         return nil, err
@@ -90,5 +93,19 @@ func (s *Service) Login(ctx context.Context, r *message.LoginUserRequest) (*mess
         return nil, err
     }
 
-    return prepareDataToResponse(result), nil
+    // create jwt standard claims
+    claims := jwt.StandardClaims{
+        ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+        Id:        fmt.Sprintf("%d", result.ID),
+        Subject:   result.CasbinUser,
+    }
+
+    // create jwt token and sign the token
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+    signedToken, err := token.SignedString([]byte(TokenKey))
+    if err != nil {
+        return nil, err
+    }
+
+    return &message.LoginUserResponse{ID: result.ID, Email: result.Email, Token: signedToken}, nil
 }
