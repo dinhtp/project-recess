@@ -10,10 +10,7 @@ build: install
 	go build -ldflags "-X main.version=$(TAG)" -o ./bin/project-recess .
 
 serve: build
-	./bin/go-company-service serve grpc
-
-clean:
-	rm -f ./bin/go-company-service
+	./bin/project-recess serve echo
 
 dev:
 	GOOS=linux make build

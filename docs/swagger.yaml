@@ -1,0 +1,197 @@
+definitions:
+  message.ListUserResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/message.User'
+        type: array
+      max_page:
+        type: integer
+      page:
+        type: integer
+      per_page:
+        type: integer
+      total_count:
+        type: integer
+    type: object
+  message.User:
+    properties:
+      account_type:
+        type: string
+      active:
+        type: boolean
+      auth_source:
+        type: string
+      billing_status:
+        type: string
+      business_unit_id:
+        type: integer
+      career_mission:
+        type: string
+      casbin_user:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      first_login:
+        type: boolean
+      first_name:
+        type: string
+      freedom_date:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: integer
+      internal:
+        type: boolean
+      last_login_time:
+        type: string
+      last_name:
+        type: string
+      location_id:
+        type: integer
+      note:
+        type: string
+      password:
+        type: string
+      updated_at:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get user list by page size and limit
+      parameters:
+      - description: current page
+        in: query
+        name: page
+        type: string
+      - description: page limit
+        in: query
+        name: per_page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/message.ListUserResponse'
+        "500":
+          description: '{"error":"error_code", "message":"error_description"}'
+          schema:
+            type: object
+      summary: Get user list
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Create user by json
+      parameters:
+      - description: Create Account
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/message.User'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/message.User'
+        "500":
+          description: '{"error":"error_code", "message":"error_description"}'
+          schema:
+            type: object
+      summary: Create a user
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete by user ID
+      parameters:
+      - description: user ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{}'
+          schema:
+            type: object
+        "500":
+          description: '{"error":"error_code", "message":"error_description"}'
+          schema:
+            type: object
+      summary: Delete a user
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      description: Get a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/message.User'
+        "500":
+          description: '{"error":"error_code", "message":"error_description"}'
+          schema:
+            type: object
+      summary: Get a user detail
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update user by json
+      parameters:
+      - description: Update User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/message.User'
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/message.User'
+        "500":
+          description: '{"error":"error_code", "message":"error_description"}'
+          schema:
+            type: object
+      summary: Update a user
+      tags:
+      - users
+swagger: "2.0"
